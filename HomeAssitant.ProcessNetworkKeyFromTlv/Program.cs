@@ -1,21 +1,29 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.Text;
+﻿using System.Text;
 
 var data = new ReadOnlySpan<byte>(Convert.FromHexString(args[0]));
-for (var index = 0; index < data.Length;)
+for (var pos = 0; pos < data.Length;)
 {
-    var tag = data[index++];
-    var length = data[index++];
-    var value =  data[new Range(index, index+=length)];
+    var tag = (MeshcopTlvType)data[pos++];
+    var length = data[pos++];
+    var value =  data[new Range(pos, pos+=length)];
 
-    Console.WriteLine(tag == 3
-        ? $"t: {tag,2} ({Enum.GetName(typeof(MeshcopTlvType), tag)}), l: {length}, v: {Encoding.UTF8.GetString(value)}"
-        : $"t: {tag,2} ({Enum.GetName(typeof(MeshcopTlvType), tag)}), l: {length}, v: 0x{Convert.ToHexString(value)}");
+    Console.WriteLine($"t: {(byte)tag,3} ({tag}), l: {length}, v: {FormatValue(in tag, in value)}");
 }
 
 
-enum MeshcopTlvType {
+static string FormatValue(ref readonly MeshcopTlvType tag, ref readonly ReadOnlySpan<byte> value)
+{
+    switch (tag)
+    {
+        case MeshcopTlvType.NetworkName:
+            return Encoding.UTF8.GetString(value);
+        default:
+            return $"0x{Convert.ToHexString(value)}" ;
+    }
+}
+
+
+enum MeshcopTlvType:byte {
     Channel= 0,
     PanID = 1,
     ExtPanId = 2,
