@@ -43,7 +43,7 @@ enum MeshcopTlvType:byte {
     State = 16,
     JoinerDtls = 17,
     JoinerUdpPort = 18,
-    JoinerIid = 19,
+    JoinerIID = 19,
     JoinerRloc = 20,
     JoinerRouterKek = 21,
     ProvisioningUrl = 32,
