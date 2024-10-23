@@ -1,15 +1,16 @@
 ﻿using System.Text;
+using HomeAssistant.ProcessNetworkKeyFromTlv;
 
 var data = new ReadOnlySpan<byte>(Convert.FromHexString(args[0]));
-for (var pos = 0; pos < data.Length;)
-{
-    var tag = (MeshcopTlvType)data[pos++];
-    var length = data[pos++];
-    var value =  data[new Range(pos, pos+=length)];
 
-    Console.WriteLine($"t: {(byte)tag,3} ({tag}), l: {length}, v: {FormatValue(in tag, in value)}");
+foreach (var tlv in Tlv.ParseTlvs(data.ToArray()))
+{
+    var tag = (MeshcopTlvType)tlv.Type.GetValueOrDefault();
+    var value = new ReadOnlySpan<byte>(tlv.Value);
+    Console.WriteLine($"t: {(byte)tag,3} ({tag}), l: {tlv.Value.Length}, v: {FormatValue(in tag, in value)}");
 }
 
+return;
 
 static string FormatValue(ref readonly MeshcopTlvType tag, ref readonly ReadOnlySpan<byte> value)
 {
